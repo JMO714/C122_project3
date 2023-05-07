@@ -58,7 +58,7 @@ bne BLACK_PRESSED
 cmn r0,#0
 
 swi CHECK_BLUE
-;bcs ERR_CHECK
+bcs ERR_CHECK
 cmp r0,#0
 bne BLUE_PRESSED
 cmn r0,#0
@@ -247,7 +247,10 @@ swi LCD_INT
 bcs ERR_BLUE
 b CHECK_BUTTONS
 
+;carry bit is not reset for last two blue buttons because their values are higher than 0x2000
+;thus carry is manually reset by cmn for bcs to function
 unassigned:
+cmn r0,#0
 mov r0, #E
 swi EIGHT_SEG
 bcs ERR_BLUE
