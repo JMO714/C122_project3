@@ -30,6 +30,7 @@
 .equ LCD_INT, 0x205
 .equ CLEAR_LCD, 0x206
 .equ PRINT_STRING, 0x02
+.equ EXIT, 0x11
 
 ;default 8_segment state
 mov r0,#0x00
@@ -257,21 +258,28 @@ bal CHECK_BUTTONS
 ERR_DEF:
 ldr r0, =err_def
 swi PRINT_STRING
+b DONE
 
 ;check button section
 ERR_CHECK:
 ldr r0, =err_check
 swi PRINT_STRING
+b DONE
 
 ;black button section
 ERR_BLACK:
 ldr r0, =err_black
 swi PRINT_STRING
+b DONE
 
 ;blue button section
 ERR_BLUE:
 ldr r0, =err_blue
 swi PRINT_STRING
+b DONE
+
+DONE:
+swi EXIT
 
 err_def: .asciz "Error, default malfunction"
 err_check: .asciz "Error, checkbutton malfunction"
