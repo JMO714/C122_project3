@@ -44,17 +44,17 @@ swi CLEAR_LCD
 bcs ERR_DEF
 mov r0,#0
 mov r1,#0
-mov r2,#0
-swi LCD_INT
-bcs ERR_DEF
-mov r0,#1
-mov r1,#0
-ldr r2,=currentLCD
+ldr r2,=defaultButton
 swi LCD_STRING
 bcs ERR_DEF
 mov r0,#0
-mov r1,#2
-ldr r2,=defaultButton
+mov r1,#1
+mov r2,#0
+swi LCD_INT
+bcs ERR_DEF
+mov r0,#3
+mov r1,#1
+ldr r2,=currentLCD
 swi LCD_STRING
 bcs ERR_DEF
 KEYPAD:
@@ -73,7 +73,13 @@ mov r1,#8
 ldr r2,=defaultKeypad3
 swi LCD_STRING
 bcs ERR_DEF
-mov r2, #0
+mov r0,#0
+mov r1,#10
+ldr r2,=defaultKeypad4
+swi LCD_STRING
+bcs ERR_DEF
+mov r1,#0
+mov r2,#0
 
 ;resets r0, checks r0 for black flag, then blue flag. loops otherwise
 ;cmn is to clear carry bit set by bne to ensure bcs works properly
@@ -97,11 +103,14 @@ bal CHECK_BUTTONS
 ;clear carry, reset 8-seg, clear LCD, then reset LCD
 BLACK_PRESSED:
 cmn r0,#0
+swi CLEAR_LCD
+bcs ERR_BLACK
 mov r0, #10
 mov r1, #2
 ldr r2, =resetLCD
 swi LCD_STRING
 bcs ERR_BLACK
+mov r3,#0
 bal DEFAULT
 
 
@@ -111,7 +120,7 @@ bal DEFAULT
 BLUE_PRESSED:
 cmn r0,#0
 mov r1, #0
-add r3,r3,r0
+
 
 cmp r0,#0x01
 beq seven
@@ -143,78 +152,166 @@ bal unassigned
 ;prints out the new lcd value then branches back to check button loop
 ;
 seven:
+add r3,r3,#7
+cmn r0,#0
+swi CLEAR_LCD
+bcs ERR_BLUE
 mov r0,#SEVEN
 swi EIGHT_SEG
+bcs ERR_BLUE
+mov r0,#0
+ldr r2,=buttonPressed7
+swi LCD_STRING
 bcs ERR_BLUE
 bal BLUE_LCD
 
 eight:
+add r3,r3,#8
+cmn r0,#0
+swi CLEAR_LCD
+bcs ERR_BLUE
 mov r0,#EIGHT
 swi EIGHT_SEG
+bcs ERR_BLUE
+mov r0,#0
+ldr r2,=buttonPressed8
+swi LCD_STRING
 bcs ERR_BLUE
 bal BLUE_LCD
 
 nine:
+add r3,r3,#9
+cmn r0,#0
+swi CLEAR_LCD
+bcs ERR_BLUE
 mov r0,#NINE
 swi EIGHT_SEG
+bcs ERR_BLUE
+mov r0,#0
+ldr r2,=buttonPressed9
+swi LCD_STRING
 bcs ERR_BLUE
 bal BLUE_LCD
 
 four:
+add r3,r3,#4
+cmn r0,#0
+swi CLEAR_LCD
+bcs ERR_BLUE
 mov r0,#FOUR
 swi EIGHT_SEG
+bcs ERR_BLUE
+mov r0,#0
+ldr r2,=buttonPressed4
+swi LCD_STRING
 bcs ERR_BLUE
 bal BLUE_LCD
 
 five:
+add r3,r3,#5
+cmn r0,#0
+swi CLEAR_LCD
+bcs ERR_BLUE
 mov r0,#FIVE
 swi EIGHT_SEG
+bcs ERR_BLUE
+mov r0,#0
+ldr r2,=buttonPressed5
+swi LCD_STRING
 bcs ERR_BLUE
 bal BLUE_LCD
 
 six:
+add r3,r3,#6
+cmn r0,#0
+swi CLEAR_LCD
+bcs ERR_BLUE
 mov r0,#SIX
 swi EIGHT_SEG
+bcs ERR_BLUE
+mov r0,#0
+ldr r2,=buttonPressed6
+swi LCD_STRING
 bcs ERR_BLUE
 bal BLUE_LCD
 
 one:
+add r3,r3,#1
+cmn r0,#0
+swi CLEAR_LCD
+bcs ERR_BLUE
 mov r0,#ONE
 swi EIGHT_SEG
+bcs ERR_BLUE
+mov r0,#0
+ldr r2,=buttonPressed1
+swi LCD_STRING
 bcs ERR_BLUE
 bal BLUE_LCD
 
 two:
+add r3,r3,#2
+cmn r0,#0
+swi CLEAR_LCD
+bcs ERR_BLUE
 mov r0,#TWO
 swi EIGHT_SEG
+bcs ERR_BLUE
+mov r0,#0
+ldr r2,=buttonPressed2
+swi LCD_STRING
 bcs ERR_BLUE
 bal BLUE_LCD
 
 three:
+add r3,r3,#3
+cmn r0,#0
+swi CLEAR_LCD
+bcs ERR_BLUE
 mov r0,#THREE
 swi EIGHT_SEG
+bcs ERR_BLUE
+mov r0,#0
+ldr r2,=buttonPressed3
+swi LCD_STRING
 bcs ERR_BLUE
 bal BLUE_LCD
 
 zero:
+cmn r0,#0
+swi CLEAR_LCD
+bcs ERR_BLUE
 mov r0,#ZERO
 swi EIGHT_SEG
 bcs ERR_BLUE
-b CHECK_BUTTONS
+mov r0,#0
+ldr r2,=buttonPressed0
+swi LCD_STRING
+bcs ERR_BLUE
+b BLUE_LCD
 
 ;if using bne: carry bit is not reset for last two blue buttons because their values are higher than 0x2000
 unassigned:
+swi CLEAR_LCD
+cmn r0,#0
 mov r0, #E
 swi EIGHT_SEG
 bcs ERR_BLUE
-bal CHECK_BUTTONS
+mov r0,#0
+ldr r2,=NALCD
+swi LCD_STRING
+bcs ERR_BLUE
 
 BLUE_LCD:
-swi CLEAR_LCD
-bcs ERR_BLUE
 mov r0,#0
+mov r1,#1
 mov r2,r3
 swi LCD_INT
+bcs ERR_BLUE
+mov r0,#3
+mov r1,#1
+ldr r2,=currentLCD
+swi LCD_STRING
 bcs ERR_BLUE
 b KEYPAD
 
@@ -261,9 +358,10 @@ buttonPressed8: .asciz "The button you pressed is 8"
 buttonPressed9: .asciz "The button you pressed is 9"
 defaultKeypad1: .asciz "7 8 9 E"
 defaultKeypad2: .asciz "4 5 6 E"
-defaultKeypad3: .asciz "E 0 E E"
+defaultKeypad3: .asciz "1 2 3 E"
+defaultKeypad4: .asciz "E 0 E E"
 resetLCD: .asciz "System reset!"
-NALCD: .asciz "Error, unassigned button pressed"
+NALCD: .asciz "Error, unassigned button pressed."
 err_def: .asciz "Error, default malfunction"
 err_check: .asciz "Error, checkbutton malfunction"
 err_black: .asciz "Error, black button malfunction"
