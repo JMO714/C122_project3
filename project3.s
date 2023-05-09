@@ -38,6 +38,8 @@ swi EIGHT_SEG
 bcs ERR_DEF
 
 ;default LCD state
+DEFAULT:
+cmn r0,#0
 swi CLEAR_LCD
 bcs ERR_DEF
 mov r0,#0
@@ -55,6 +57,7 @@ mov r1,#2
 ldr r2,=defaultButton
 swi LCD_STRING
 bcs ERR_DEF
+KEYPAD:
 mov r0,#0
 mov r1,#4
 ldr r2,=defaultKeypad1
@@ -94,27 +97,13 @@ bal CHECK_BUTTONS
 ;clear carry, reset 8-seg, clear LCD, then reset LCD
 BLACK_PRESSED:
 cmn r0,#0
-mov r3, #0
-;default 8_segment state
-mov r0,#0x00
-swi EIGHT_SEG
-bcs ERR_BLACK
-;default LCD state
-swi CLEAR_LCD
-bcs ERR_BLACK
-mov r2, #0
-mov r1, #0
-mov r0, #0
-swi LCD_INT
-bcs ERR_BLACK
 mov r0, #10
 mov r1, #2
 ldr r2, =resetLCD
 swi LCD_STRING
 bcs ERR_BLACK
-mov r1,#0
-mov r2,#0
-bal CHECK_BUTTONS
+bal DEFAULT
+
 
 ;clears carry from bne
 ;copies blue button val to r3 for cmp
@@ -122,6 +111,7 @@ bal CHECK_BUTTONS
 BLUE_PRESSED:
 cmn r0,#0
 mov r1, #0
+add r3,r3,r0
 
 ;one section for each blue button
 ;if value not equal to button, branches to next button check
@@ -134,7 +124,6 @@ seven:
 cmp r0,#0x01
 bne eight
 cmn r0,#0
-add r3,r3,#7
 mov r0,#SEVEN
 swi EIGHT_SEG
 bcs ERR_BLUE
@@ -144,7 +133,6 @@ eight:
 cmp r0,#0x02
 bne nine
 cmn r0,#0
-add r3,r3,#8
 mov r0,#EIGHT
 swi EIGHT_SEG
 bcs ERR_BLUE
@@ -154,7 +142,6 @@ nine:
 cmp r0,#0x04
 bne four
 cmn r0,#0
-add r3,r3,#9
 mov r0,#NINE
 swi EIGHT_SEG
 bcs ERR_BLUE
@@ -164,7 +151,6 @@ four:
 cmp r0,#0x10
 bne five
 cmn r0,#0
-add r3,r3,#4
 mov r0,#FOUR
 swi EIGHT_SEG
 bcs ERR_BLUE
@@ -173,7 +159,6 @@ bal BLUE_LCD
 five:
 cmp r0,#0x20
 bne six
-add r3,r3,#5
 cmn r0,#0
 mov r0,#FIVE
 swi EIGHT_SEG
@@ -183,7 +168,6 @@ bal BLUE_LCD
 six:
 cmp r0,#0x40
 bne one
-add r3,r3,#6
 cmn r0,#0
 mov r0,#SIX
 swi EIGHT_SEG
@@ -245,7 +229,8 @@ mov r0,#0
 mov r2,r3
 swi LCD_INT
 bcs ERR_BLUE
-b CHECK_BUTTONS
+b KEYPAD
+
 
 ;if any swi commands fail, branch to various errors for each section
 ;default state/startup section
