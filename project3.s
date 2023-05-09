@@ -113,6 +113,28 @@ cmn r0,#0
 mov r1, #0
 add r3,r3,r0
 
+cmp r0,#0x01
+beq seven
+cmp r0,#0x02
+beq eight
+cmp r0,#0x04
+beq nine
+cmp r0,#0x10
+beq four
+cmp r0,#0x20
+beq five
+cmp r0,#0x40
+beq six
+cmp r0,#0x100
+beq one
+cmp r0,#0x200
+beq two
+cmp r0,#0x400
+beq three
+cmp r0,#0x2000
+beq zero
+bal unassigned
+
 ;one section for each blue button
 ;if value not equal to button, branches to next button check
 ;if equal, clears carry, sets r0 to segment value, prints segment
@@ -121,102 +143,67 @@ add r3,r3,r0
 ;prints out the new lcd value then branches back to check button loop
 ;
 seven:
-cmp r0,#0x01
-bne eight
-cmn r0,#0
 mov r0,#SEVEN
 swi EIGHT_SEG
 bcs ERR_BLUE
 bal BLUE_LCD
 
 eight:
-cmp r0,#0x02
-bne nine
-cmn r0,#0
 mov r0,#EIGHT
 swi EIGHT_SEG
 bcs ERR_BLUE
 bal BLUE_LCD
 
 nine:
-cmp r0,#0x04
-bne four
-cmn r0,#0
 mov r0,#NINE
 swi EIGHT_SEG
 bcs ERR_BLUE
 bal BLUE_LCD
 
 four:
-cmp r0,#0x10
-bne five
-cmn r0,#0
 mov r0,#FOUR
 swi EIGHT_SEG
 bcs ERR_BLUE
 bal BLUE_LCD
 
 five:
-cmp r0,#0x20
-bne six
-cmn r0,#0
 mov r0,#FIVE
 swi EIGHT_SEG
 bcs ERR_BLUE
 bal BLUE_LCD
 
 six:
-cmp r0,#0x40
-bne one
-cmn r0,#0
 mov r0,#SIX
 swi EIGHT_SEG
 bcs ERR_BLUE
 bal BLUE_LCD
 
 one:
-cmp r0,#0x100
-bne two
-cmn r0,#0
-add r3,r3,#1
 mov r0,#ONE
 swi EIGHT_SEG
 bcs ERR_BLUE
 bal BLUE_LCD
 
 two:
-cmp r0,#0x200
-bne three
-cmn r0,#0
-add r3,r3,#2
 mov r0,#TWO
 swi EIGHT_SEG
 bcs ERR_BLUE
 bal BLUE_LCD
 
 three:
-cmp r0,#0x400
-bne zero
-cmn r0,#0
-add r3,r3,#3
 mov r0,#THREE
 swi EIGHT_SEG
 bcs ERR_BLUE
 bal BLUE_LCD
 
 zero:
-cmp r0,#0x2000
-bne unassigned
-cmn r0,#0
 mov r0,#ZERO
 swi EIGHT_SEG
 bcs ERR_BLUE
 b CHECK_BUTTONS
 
-;carry bit is not reset for last two blue buttons because their values are higher than 0x2000
-;thus carry is manually reset by cmn for bcs to function
+;if using bne: carry bit is not reset for last two blue buttons because their values are higher than 0x2000
 unassigned:
-cmn r0,#0
 mov r0, #E
 swi EIGHT_SEG
 bcs ERR_BLUE
