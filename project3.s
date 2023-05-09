@@ -138,13 +138,7 @@ add r3,r3,#7
 mov r0,#SEVEN
 swi EIGHT_SEG
 bcs ERR_BLUE
-swi CLEAR_LCD
-bcs ERR_BLUE
-mov r0,#0
-mov r2,r3
-swi LCD_INT
-bcs ERR_BLUE
-b CHECK_BUTTONS
+bal BLUE_LCD
 
 eight:
 cmp r0,#0x02
@@ -154,13 +148,7 @@ add r3,r3,#8
 mov r0,#EIGHT
 swi EIGHT_SEG
 bcs ERR_BLUE
-mov r0,#0
-swi CLEAR_LCD
-bcs ERR_BLUE
-mov r2,r3
-swi LCD_INT
-bcs ERR_BLUE
-b CHECK_BUTTONS
+bal BLUE_LCD
 
 nine:
 cmp r0,#0x04
@@ -170,13 +158,7 @@ add r3,r3,#9
 mov r0,#NINE
 swi EIGHT_SEG
 bcs ERR_BLUE
-mov r0,#0
-swi CLEAR_LCD
-bcs ERR_BLUE
-mov r2,r3
-swi LCD_INT
-bcs ERR_BLUE
-b CHECK_BUTTONS
+bal BLUE_LCD
 
 four:
 cmp r0,#0x10
@@ -186,13 +168,7 @@ add r3,r3,#4
 mov r0,#FOUR
 swi EIGHT_SEG
 bcs ERR_BLUE
-mov r0,#0
-swi CLEAR_LCD
-bcs ERR_BLUE
-mov r2,r3
-swi LCD_INT
-bcs ERR_BLUE
-b CHECK_BUTTONS
+bal BLUE_LCD
 
 five:
 cmp r0,#0x20
@@ -202,13 +178,7 @@ cmn r0,#0
 mov r0,#FIVE
 swi EIGHT_SEG
 bcs ERR_BLUE
-mov r0,#0
-swi CLEAR_LCD
-bcs ERR_BLUE
-mov r2,r3
-swi LCD_INT
-bcs ERR_BLUE
-b CHECK_BUTTONS
+bal BLUE_LCD
 
 six:
 cmp r0,#0x40
@@ -218,13 +188,7 @@ cmn r0,#0
 mov r0,#SIX
 swi EIGHT_SEG
 bcs ERR_BLUE
-mov r0,#0
-swi CLEAR_LCD
-bcs ERR_BLUE
-mov r2,r3
-swi LCD_INT
-bcs ERR_BLUE
-b CHECK_BUTTONS
+bal BLUE_LCD
 
 one:
 cmp r0,#0x100
@@ -234,13 +198,7 @@ add r3,r3,#1
 mov r0,#ONE
 swi EIGHT_SEG
 bcs ERR_BLUE
-mov r0,#0
-swi CLEAR_LCD
-bcs ERR_BLUE
-mov r2,r3
-swi LCD_INT
-bcs ERR_BLUE
-b CHECK_BUTTONS
+bal BLUE_LCD
 
 two:
 cmp r0,#0x200
@@ -250,13 +208,7 @@ add r3,r3,#2
 mov r0,#TWO
 swi EIGHT_SEG
 bcs ERR_BLUE
-mov r0,#0
-swi CLEAR_LCD
-bcs ERR_BLUE
-mov r2,r3
-swi LCD_INT
-bcs ERR_BLUE
-b CHECK_BUTTONS
+bal BLUE_LCD
 
 three:
 cmp r0,#0x400
@@ -266,13 +218,7 @@ add r3,r3,#3
 mov r0,#THREE
 swi EIGHT_SEG
 bcs ERR_BLUE
-mov r0,#0
-swi CLEAR_LCD
-bcs ERR_BLUE
-mov r2,r3
-swi LCD_INT
-bcs ERR_BLUE
-b CHECK_BUTTONS
+bal BLUE_LCD
 
 zero:
 cmp r0,#0x2000
@@ -291,6 +237,15 @@ mov r0, #E
 swi EIGHT_SEG
 bcs ERR_BLUE
 bal CHECK_BUTTONS
+
+BLUE_LCD:
+swi CLEAR_LCD
+bcs ERR_BLUE
+mov r0,#0
+mov r2,r3
+swi LCD_INT
+bcs ERR_BLUE
+b CHECK_BUTTONS
 
 ;if any swi commands fail, branch to various errors for each section
 ;default state/startup section
